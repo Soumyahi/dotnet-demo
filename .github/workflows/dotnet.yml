@@ -2,22 +2,28 @@
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Check .NET Version
-        run: dotnet --version
+    - name: Verify .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0
 
-      - name: Restore Packages
-        run: dotnet restore
+    - name: Restore
+      run: dotnet restore Calculator.sln
 
-      - name: Build Project
-        run: dotnet build --configuration Release
+    - name: Build
+      run: dotnet build Calculator.sln --configuration Release --no-restore
+
+    - name: Lint
+      run: dotnet format Calculator.sln --verify-no-changes
