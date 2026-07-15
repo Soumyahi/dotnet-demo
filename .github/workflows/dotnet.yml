@@ -1,23 +1,29 @@
-﻿name: .NET CI
+name: .NET CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
 
 jobs:
   build:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Check .NET SDK
-        run: dotnet --version
+    - name: Verify .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
 
-      - name: Restore
-        run: dotnet restore Dotnet_test.csproj
+    - name: Restore
+      run: dotnet restore Dotnet_test/Dotnet_test.csproj
 
-      - name: Build
-       run: dotnet build Dotnet_test.csproj --configuration Release --no-restore
+    - name: Build
+      run: dotnet build Dotnet_test/Dotnet_test.csproj --configuration Release --no-restore
+
+    - name: Lint
+      run: dotnet format Dotnet_test/Dotnet_test.csproj --verify-no-changes
